@@ -50,6 +50,9 @@ var SlackData = function (_EventEmitter) {
       var _this2 = this;
 
       _superagent2.default.get('https://' + this.host + '.slack.com/api/channels.list').query({ token: this.token }).end(function (err, res) {
+        if (err) {
+          throw err;
+        }
         (res.body.channels || []).forEach(function (channel) {
           _this2.channelsByName[channel.name] = channel;
         });
@@ -99,7 +102,7 @@ var SlackData = function (_EventEmitter) {
 
       var users = res.body.members;
 
-      if (!users) {
+      if (!users || users && !users.length) {
         var _err = new Error('Invalid Slack response: ' + res.status);
         this.emit('error', _err);
         return this.retry();
